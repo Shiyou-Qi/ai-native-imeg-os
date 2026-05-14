@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import {
@@ -493,7 +493,17 @@ function UserProfile({ collapsed }: { collapsed: boolean }) {
 }
 
 function ThemeToggle({ collapsed }: { collapsed: boolean }) {
+  const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
+
+  useEffect(() => { setMounted(true) }, [])
+
+  if (!mounted) {
+    return (
+      <div className="flex items-center justify-center size-7" />
+    )
+  }
+
   const isDark = theme === 'dark'
 
   return (
@@ -501,6 +511,7 @@ function ThemeToggle({ collapsed }: { collapsed: boolean }) {
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       className="flex items-center justify-center size-7 rounded-md text-muted-foreground transition-colors hover:bg-hover-overlay hover:text-foreground"
       title={isDark ? '切换到浅色模式' : '切换到深色模式'}
+      suppressHydrationWarning
     >
       {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
     </button>

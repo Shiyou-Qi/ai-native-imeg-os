@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTheme } from 'next-themes'
 import { motion } from 'framer-motion'
 import {
@@ -70,7 +70,10 @@ const settingsSections = [
 export function SettingsPage() {
   const { setCurrentPage } = useWorkspaceStore()
   const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
   const [activeSection, setActiveSection] = useState('appearance')
+
+  useEffect(() => { setMounted(true) }, [])
 
   // Appearance settings
   const [language, setLanguage] = useState('zh-CN')
@@ -173,14 +176,15 @@ export function SettingsPage() {
                       <button
                         key={t.id}
                         onClick={() => setTheme(t.id)}
+                        suppressHydrationWarning
                         className={cn(
                           'flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-colors',
-                          theme === t.id
+                          mounted && theme === t.id
                             ? 'border-primary bg-primary/5'
                             : 'border-border hover:border-muted-foreground/30'
                         )}
                       >
-                        <t.icon className={cn('size-6', theme === t.id ? 'text-primary' : 'text-muted-foreground')} />
+                        <t.icon className={cn('size-6', mounted && theme === t.id ? 'text-primary' : 'text-muted-foreground')} />
                         <span className="text-sm font-medium">{t.label}</span>
                       </button>
                     ))}

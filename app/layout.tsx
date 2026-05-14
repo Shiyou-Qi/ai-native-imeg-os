@@ -54,7 +54,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" className="bg-background" suppressHydrationWarning>
-      <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`}>
+      <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`} suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

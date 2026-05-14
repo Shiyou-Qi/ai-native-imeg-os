@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   Sparkles,
@@ -19,6 +20,7 @@ import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { useWorkspaceStore } from '@/stores'
 import { QuickCreateBar, type TemplatePreset } from './quick-create-bar'
 
 interface Template {
@@ -165,9 +167,11 @@ const sortOptions = [
 function TemplateCard({
   template,
   onUseTemplate,
+  onClick,
 }: {
   template: Template
   onUseTemplate: (template: Template) => void
+  onClick: (template: Template) => void
 }) {
   return (
     <motion.div
@@ -177,7 +181,7 @@ function TemplateCard({
     >
       <div className="relative overflow-hidden rounded-xl bg-card">
         {/* Image */}
-        <div className="relative aspect-[4/3] overflow-hidden">
+        <div className="relative aspect-[4/3] overflow-hidden" onClick={() => onClick(template)}>
           <img
             src={template.image}
             alt={template.title}
@@ -210,10 +214,7 @@ function TemplateCard({
           </div>
         </div>
         {/* Info */}
-        <div
-          className="p-3"
-          onClick={() => onUseTemplate(template)}
-        >
+        <div className="p-3" onClick={() => onClick(template)}>
           <h3 className="mb-1 font-medium text-foreground">{template.title}</h3>
           <p className="mb-2 text-xs text-muted-foreground line-clamp-1">{template.description}</p>
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -227,10 +228,29 @@ function TemplateCard({
 }
 
 export function TemplatesPage() {
+  const router = useRouter()
+  const setImageDetail = useWorkspaceStore((s) => s.setImageDetail)
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedSort, setSelectedSort] = useState('popular')
   const [searchQuery, setSearchQuery] = useState('')
   const [activePreset, setActivePreset] = useState<TemplatePreset | null>(null)
+
+  const handleTemplateClick = useCallback((template: Template) => {
+    setImageDetail(template.id, {
+      id: template.id,
+      src: template.image,
+      prompt: template.preset.prompt,
+      width: 1024,
+      height: 1024,
+      likes: template.usageCount,
+      isLiked: false,
+      model: 'Stable Diffusion XL',
+      parameters: { size: '1024 × 1024', steps: 30, guidance: 7.5, seed: 12345 },
+      createdAt: new Date(),
+      history: [],
+    })
+    router.push(`/image/${template.id}`)
+  }, [router, setImageDetail])
 
   const handleUseTemplate = useCallback((template: Template) => {
     setActivePreset({
@@ -342,6 +362,7 @@ export function TemplatesPage() {
                 key={template.id}
                 template={template}
                 onUseTemplate={handleUseTemplate}
+                onClick={handleTemplateClick}
               />
             ))}
           </motion.div>
