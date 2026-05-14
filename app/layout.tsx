@@ -53,7 +53,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="zh-CN" className="bg-background">
+    <html lang="zh-CN" className="bg-background" suppressHydrationWarning>
       <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`}>
         <ThemeProvider
           attribute="class"
